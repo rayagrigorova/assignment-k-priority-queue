@@ -22,28 +22,28 @@ int main()
         std::cout << e.what() << std::endl << std::endl;
     }
 
-    q.peek(); // B
+    std::cout << "Peek: " << q.peek() << std::endl << std::endl; // B
 
     q.pop();
     q.print();
     std::cout << std::endl;
 
-    q.peek(); // C
+    std::cout << "Peek: " << q.peek() << std::endl << std::endl; // C
     q.pop();
     q.print();
     std::cout << std::endl;
 
-    q.peek(); // D
+    std::cout << "Peek: " << q.peek() << std::endl << std::endl; // D
     q.pop();
     q.print();
     std::cout << std::endl;
 
-    q.peek(); // E
+    std::cout << "Peek: " << q.peek() << std::endl << std::endl; // E
     q.pop();
     q.print();
     std::cout << std::endl;
 
-    q.peek(); // A
+    std::cout << "Peek: " << q.peek() << std::endl << std::endl; // A
     q.pop();
     q.print();
     std::cout << std::endl;

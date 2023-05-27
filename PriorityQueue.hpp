@@ -5,24 +5,30 @@
 
 template <typename T>
 class PriorityQueue {
-	DynamicArray<Element<T>> _queue; 
+	// The elements in the queue are sorted in ascending order based on their priority 
+	// so that pop() is faster 
+	DynamicArray<Element<T>> _queue;
 	unsigned _maxPriority = 0;
+
+	unsigned shiftQueue(unsigned priority, unsigned oldSize);
 
 public:
 	PriorityQueue(unsigned maxPriority);
 
 	void push(const T& el, unsigned priority);
-	void push(T&& el, unsigned priority);
+	void push(const Element<T>& el);
+	void push(Element<T>&& el);
+
 	void pop();
 	const T& peek() const;
 
-	bool isEmpty() const; 
+	bool isEmpty() const;
 
 	void print() const;
 };
 
 template <typename T>
-PriorityQueue<T>::PriorityQueue(unsigned maxPriority) : _maxPriority(maxPriority){
+PriorityQueue<T>::PriorityQueue(unsigned maxPriority) : _maxPriority(maxPriority) {
 
 }
 
@@ -32,36 +38,36 @@ void PriorityQueue<T>::push(const T& el, unsigned priority) {
 		throw std::invalid_argument("Error! no such priority!");
 	}
 
-	size_t size = _queue.getSize();
-	unsigned i;
-
-	// Insert the element in the array 
-	// The elements with the highest priority should come first in the array 
-	for (i = size - 1; i >= 1 && el._priority > _queue[i].priority; i--) {
-		_queue[i] = _queue[i - 1];
-	}
-	_queue[i] = el; 
+	// Insert an uninitialized element in the end of the array.
+	// This is done to make place for the new element. 
+	unsigned oldSize = _queue.getSize();
+	_queue.pushBack(Element<T>());
+	unsigned i = shiftQueue(priority, oldSize);
+	_queue[i] = Element<T>(el, priority);
 }
 
 template <typename T>
-void PriorityQueue<T>::push(T&& el, unsigned priority) {
-	if (priority > _maxPriority) {
-		throw std::invalid_argument("Error! No such priority!");
+void PriorityQueue<T>::push(const Element<T>& el) {
+	if (el._priority > _maxPriority) {
+		throw std::invalid_argument("Error! no such priority!");
 	}
 
-	Element<T> toAdd(el, priority);
-	_queue.pushBack(toAdd);
+	unsigned oldSize = _queue.getSize();
+	_queue.pushBack(Element<T>());
+	unsigned i = shiftQueue(el._priority, oldSize);
+	_queue[i] = el;
+}
 
-	unsigned i;
-	size_t size = _queue.getSize();
-
-	// Insert the element in the array 
-	// The elements with the highest priority should come first in the array 
-	for (i = size - 1; i >= 1 && priority > _queue[i - 1]._priority; i--) {
-		_queue[i] = _queue[i - 1];
+template <typename T>
+void PriorityQueue<T>::push(Element<T>&& el) {
+	if (el._priority > _maxPriority) {
+		throw std::invalid_argument("Error! no such priority!");
 	}
 
-	_queue.setAtIndex(toAdd, i);
+	unsigned oldSize = _queue.getSize();
+	_queue.pushBack(Element<T>());
+	unsigned i = shiftQueue(el._priority, oldSize);
+	_queue[i] = std::move(el);
 }
 
 template <typename T>
@@ -70,7 +76,8 @@ void PriorityQueue<T>::pop() {
 		throw std::logic_error("Error! Empty queue!");
 	}
 
-	_queue.erase(0);
+	// The last element in the array is of highest priority 
+	_queue.erase(_queue.getSize() - 1);
 }
 
 template <typename T>
@@ -78,6 +85,7 @@ const T& PriorityQueue<T>::peek() const {
 	if (isEmpty()) {
 		throw std::logic_error("Error! Empty queue!");
 	}
+	return _queue[_queue.getSize() - 1]._value;
 }
 
 template <typename T>
@@ -97,4 +105,17 @@ void PriorityQueue<T>::print() const {
 	for (int i = 0; i < size; i++) {
 		_queue[i].print();
 	}
+}
+
+template <typename T>
+unsigned PriorityQueue<T>::shiftQueue(unsigned priority, unsigned oldSize) {
+	if (oldSize == 0) {
+		return 0;
+	}
+
+	unsigned i;
+	for (i = oldSize; i >= 1 && priority <= _queue[i - 1]._priority; i--) {
+		_queue[i] = _queue[i - 1];
+	}
+	return i;
 }

@@ -4,10 +4,10 @@ template <typename T>
 struct Element {
 	T _value;
 
-	// The default priority is -1 so that 
+	// The default priority is INT_MAX so that 
 	// elements with a priority of 0 or higher
 	// are sorted before uninitialized elements.  
-	int _priority = -1;
+	int _priority = INT_MAX;
 
 	Element() = default;
 	Element(const T& value, int priority);
