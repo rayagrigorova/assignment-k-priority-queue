@@ -222,6 +222,10 @@ T& DynamicArray<T>::operator[](size_t index)
 	return arr[index];
 }
 
+// Delete an element at a given position 
+// The elements after the given position are shifted
+// This function is used in the queue's pop() function 
+// However, no shifting is done because the element to be removed is the last one in the array and pos == size - 1
 template <typename T>
 void DynamicArray<T>::erase(size_t pos) {
 	if (pos >= size) {
