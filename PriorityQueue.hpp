@@ -3,10 +3,12 @@
 #include "Element.hpp"
 #include "DynamicArray.hpp"
 
+// NOTE: The elements in the queue are sorted in ascending order based on their priority 
+// so that pop() is faster - the only operation performed is decreasing the array size. 
+
 template <typename T>
 class PriorityQueue {
-	// The elements in the queue are sorted in ascending order based on their priority 
-	// so that pop() is faster - O(1) to decrease the size of the array 
+
 	DynamicArray<Element<T>> _queue;
 	unsigned _maxPriority = 0;
 
@@ -36,7 +38,7 @@ PriorityQueue<T>::PriorityQueue(unsigned maxPriority) : _maxPriority(maxPriority
 template <typename T>
 void PriorityQueue<T>::push(const T& val, unsigned priority) {
 	if (priority >= _maxPriority) {
-		throw std::invalid_argument("Error! no such priority!");
+		throw std::invalid_argument("Error! No such priority!");
 	}
 
 	unsigned i = makePlaceAndShift(val, priority);
@@ -46,7 +48,7 @@ void PriorityQueue<T>::push(const T& val, unsigned priority) {
 template <typename T>
 void PriorityQueue<T>::push(const Element<T>& el) {
 	if (el._priority >= _maxPriority) {
-		throw std::invalid_argument("Error! no such priority!");
+		throw std::invalid_argument("Error! No such priority!");
 	}
 
 	unsigned i = makePlaceAndShift(el._value, el._priority);
@@ -87,6 +89,7 @@ bool PriorityQueue<T>::isEmpty() const {
 	return _queue.getSize() == 0;
 }
 
+// This function is only used to demonstrate how the program works (to display the contents of the queue in main)
 template <typename T>
 void PriorityQueue<T>::print() const {
 	if (isEmpty()) {
@@ -102,13 +105,29 @@ void PriorityQueue<T>::print() const {
 	}
 }
 
+template<typename T>
+inline unsigned PriorityQueue<T>::makePlaceAndShift(const T& val, unsigned priority) {
+	unsigned oldSize = _queue.getSize();
+
+	// Insert an uninitialized element in the end of the array.
+	// This is done to make place for the new element. 
+	_queue.pushBack(Element<T>());
+
+	return shiftQueue(priority, oldSize); // this function returns the index where the new element should be inserted
+}
+
 template <typename T>
 unsigned PriorityQueue<T>::shiftQueue(unsigned priority, unsigned oldSize) {
+	// If this is the first element to be added in the queue
 	if (oldSize == 0) {
 		return 0;
 	}
 
 	unsigned i;
+
+	// Find a place for the new element in the queue. It should be before 
+	// an element with a (strictly) lower priority, but after elements with the same or higher priority (if there are such). 
+	
 	// <= so that the new element is put after ones with the same priority in the queue 
 	for (i = oldSize; i >= 1 && priority <= _queue[i - 1]._priority; i--) {
 		_queue[i] = _queue[i - 1];
@@ -116,12 +135,4 @@ unsigned PriorityQueue<T>::shiftQueue(unsigned priority, unsigned oldSize) {
 	return i;
 }
 
-template<typename T>
-inline unsigned PriorityQueue<T>::makePlaceAndShift(const T& val, unsigned priority) {
-	// Insert an uninitialized element in the end of the array.
-	// This is done to make place for the new element. 
-	unsigned oldSize = _queue.getSize();
-	_queue.pushBack(Element<T>());
 
-	return shiftQueue(priority, oldSize); // this function returns the index where the new element should be inserted
-}

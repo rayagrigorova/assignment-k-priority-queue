@@ -20,7 +20,9 @@ Element<T>::Element(const T& value, int priority) : _value(value), _priority(pri
 
 }
 
+// This function is only used to demonstrate how the program works (to display the contents of the queue in main)
 template <typename T>
 void Element<T>::print() const {
+	// _value should have an operator '<<' for the print() function to work
 	std::cout << "Value: " << _value << " Priority: " << _priority << std::endl;
 }
